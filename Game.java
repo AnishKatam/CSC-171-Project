@@ -1,21 +1,74 @@
 package Poker;
-import random;
+
+import java.util.Random;
 
 public class Game {
-    public Card giveHands(){
-        int randomCard = random.randint(1, 13);
-        String[] suits = {"Hearts", "Diamonds", "Clubs", "Spades"};
-        String suit = suits[random.randint(0, 3)];
-        Card card1 = new Card(randomCard, suit);
-        card1.setDealt(true);
-    
-        int randomCard2 = random.randint(1, 13);
-        String suit2 = suits[random.randint(0, 3)];
-        if (suit2.equals(suit)) {
-            suit2 = suits[random.randint(0, 3)];
+    private Deck deck;
+    private int pot;
+
+    public Game() {
+        deck = new Deck();
+        pot = 0;
+    }
+
+    public void giveHands(Player[] players) {
+        for (Player player : players) {
+            Card[] playerHand = new Card[2];
+
+            playerHand[0] = deck.dealCard();
+            playerHand[0].setDealt(true);
+
+            playerHand[1] = deck.dealCard();
+            playerHand[1].setDealt(true);
+
+            player.setHand(playerHand);
         }
-        Card card2 = new Card(randomCard2, suit2);
-        card2.setDealt(true);
-        return card1,card2;
+    }
+
+    public Card[] giveFlop() {
+        Card[] cards = new Card[3];
+
+        // Deal 3 cards for the flop
+        for (int i = 0; i < 3; i++) {
+            cards[i] = deck.dealCard();
+        }
+
+        return cards;
+    }
+
+    public Card giveTurn() {
+        return deck.dealCard();
+    }
+
+    public static int countActivePlayers(Player[] players) {
+        int count = 0;
+        for (Player player : players) {
+            if (!player.isFolded() && !player.isAllIn()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public String declareWinner(Player[] players, String winnerName) {
+        for (Player player : players) {
+            if (player.getName().equals(winnerName)) {
+                player.addBalance(pot);
+                return player.getName() + " wins the pot!";
+            }
+        }
+        return "No winner found";
+    }
+
+    public int calculatePot() {
+        return pot;
+    }
+
+    public void addToPot(int amount) {
+        pot += amount;
+    }
+
+    public void resetPot() {
+        pot = 0;
     }
 }
